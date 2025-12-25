@@ -34,13 +34,16 @@ export function ProjectsDashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    loadProjects();
-  }, []);
+    if (user) {
+      loadProjects();
+    }
+  }, [user]);
 
   const loadProjects = () => {
+    if (!user) return;
     const allProjects = projectStorage.getAll();
     const userProjects = allProjects.filter(
-      (p: Project) => p.userId === user?.id
+      (p: Project) => p.userId === user.id
     );
     setProjects(userProjects);
   };
@@ -90,7 +93,9 @@ export function ProjectsDashboard() {
 
   const handleProjectDeleted = (projectId: string) => {
     projectStorage.delete(projectId);
-    loadProjects();
+    // Immediately update state by filtering out the deleted project
+    setProjects(prevProjects => prevProjects.filter(p => p.id !== projectId));
+    showSuccess("Project deleted successfully");
   };
 
   return (

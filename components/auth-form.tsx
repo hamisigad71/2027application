@@ -52,7 +52,7 @@ export function AuthForm() {
 
     console.log("[v0] Calling login with:", { signInEmail, signInName });
     login(signInEmail, signInName);
-    showSuccess("Signed in successfully!");
+    showSuccess(`🎉 Welcome back, ${signInName}!`);
   };
 
   const handleSignUp = (e: React.FormEvent) => {
@@ -66,7 +66,7 @@ export function AuthForm() {
 
     console.log("[v0] Calling login with full profile");
     login(email, name, organization, role, phone, country);
-    showSuccess("Account created successfully!");
+    showSuccess(`🎉 Welcome, ${name}!`);
   };
 
   const handleGoogleSignIn = (e: React.MouseEvent) => {
@@ -83,7 +83,7 @@ export function AuthForm() {
 
     console.log("[v0] Logging in demo user");
     login(demoEmail, demoName, demoOrg, demoRole, demoPhone, demoCountry);
-    showSuccess("Signed in with Google!");
+    showSuccess(`🎉 Welcome back, ${demoName}!`);
   };
 
   return (
@@ -189,14 +189,17 @@ export function AuthForm() {
         <Card className="shadow-xl border-0">
           <CardHeader className="space-y-1 pb-6">
             <div className="md:hidden mb-4">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-900 text-white mb-3">
-                <Building2 className="h-6 w-6" />
+              <div className="flex items-center gap-3">
+                <div className="inline-flex items-center justify-center shrink-0 w-12 h-12 rounded-xl bg-blue-900 text-white">
+                  <Building2 className="h-6 w-6" />
+                </div>
+                <p className="text-sm font-medium text-slate-700">
+                  Smarter housing decisions through data and simulation
+                </p>
               </div>
             </div>
             <CardTitle className="text-2xl">Welcome</CardTitle>
-            <CardDescription>
-              Sign in to your account or create a new one
-            </CardDescription>
+            <CardDescription>Sign in to Access the platform</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs

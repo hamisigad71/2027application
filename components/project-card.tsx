@@ -20,8 +20,10 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
 
   const handleDelete = () => {
     if (showDeleteConfirm) {
+      // Second click - actually delete
       onDelete(project.id)
     } else {
+      // First click - show confirmation
       setShowDeleteConfirm(true)
       setTimeout(() => setShowDeleteConfirm(false), 3000)
     }
@@ -68,9 +70,15 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+              <DropdownMenuItem 
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleDelete()
+                }}
+                className={`${showDeleteConfirm ? "text-red-600 bg-red-50" : "text-destructive"} cursor-pointer`}
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
-                {showDeleteConfirm ? "Click again to confirm" : "Delete Project"}
+                {showDeleteConfirm ? "⚠️ Click again to confirm" : "Delete Project"}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

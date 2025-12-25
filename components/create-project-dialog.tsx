@@ -23,6 +23,7 @@ import {
 import { useAuth } from "./auth-provider";
 import { useToast } from "./toast-provider";
 import { projectStorage } from "@/lib/storage";
+import { getAvailableCountries } from "@/lib/country-data";
 
 interface CreateProjectDialogProps {
   open: boolean;
@@ -39,8 +40,10 @@ export function CreateProjectDialog({
   const { showSuccess } = useToast();
   const [formData, setFormData] = useState({
     name: "",
+    projectType: "apartment" as "apartment" | "single-family" | "mixed",
     city: "",
-    country: "",
+    countryCode: "",
+    countryName: "",
     landSize: "",
     landSizeUnit: "sqm" as "sqm" | "acres",
     targetIncomeGroup: "low" as "low" | "lower-middle" | "middle" | "mixed",
@@ -53,13 +56,19 @@ export function CreateProjectDialog({
     e.preventDefault();
 
     if (!user) return;
+    if (!formData.countryCode) {
+      alert("Please select a country");
+      return;
+    }
 
     projectStorage.create({
       userId: user.id,
+      projectType: formData.projectType,
       name: formData.name,
       location: {
         city: formData.city,
-        country: formData.country,
+        country: formData.countryName,
+        countryCode: formData.countryCode,
       },
       landSize: Number.parseFloat(formData.landSize),
       landSizeUnit: formData.landSizeUnit,
@@ -76,8 +85,10 @@ export function CreateProjectDialog({
     // Reset form
     setFormData({
       name: "",
+      projectType: "apartment",
       city: "",
-      country: "",
+      countryCode: "",
+      countryName: "",
       landSize: "",
       landSizeUnit: "sqm",
       targetIncomeGroup: "low",
@@ -116,6 +127,32 @@ export function CreateProjectDialog({
             />
           </div>
 
+          {/* Project Type */}
+          <div className="space-y-2">
+            <Label htmlFor="projectType">Housing Type</Label>
+            <Select
+              value={formData.projectType}
+              onValueChange={(value: any) =>
+                setFormData({ ...formData, projectType: value })
+              }
+            >
+              <SelectTrigger id="projectType">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="apartment">
+                  Multi-Unit Apartments (High Density)
+                </SelectItem>
+                <SelectItem value="single-family">
+                  Single-Family Homes (Low Density)
+                </SelectItem>
+                <SelectItem value="mixed">
+                  Mixed Development (Apartments + Single-Family)
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Location */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -132,15 +169,28 @@ export function CreateProjectDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="country">Country</Label>
-              <Input
-                id="country"
-                placeholder="e.g., Kenya"
-                value={formData.country}
-                onChange={(e) =>
-                  setFormData({ ...formData, country: e.target.value })
-                }
-                required
-              />
+              <Select
+                value={formData.countryCode}
+                onValueChange={(code) => {
+                  const country = getAvailableCountries().find(c => c.code === code)
+                  setFormData({ 
+                    ...formData, 
+                    countryCode: code,
+                    countryName: country?.name || ""
+                  })
+                }}
+              >
+                <SelectTrigger id="country">
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {getAvailableCountries().map((country) => (
+                    <SelectItem key={country.code} value={country.code}>
+                      {country.name} ({country.region})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

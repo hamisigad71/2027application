@@ -16,6 +16,7 @@ import { ProjectHeader } from "@/components/project-header";
 import { ScenarioComparison } from "@/components/scenario-comparison";
 import { DemandForecasting } from "@/components/demand-forecasting";
 import { ProjectReport } from "@/components/project-report";
+import { ProjectSettings } from "@/components/project-settings";;
 
 export default function ProjectPage({
   params,
@@ -31,7 +32,6 @@ export default function ProjectPage({
   const [activeTab, setActiveTab] = useState("scenarios");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [canGoBack, setCanGoBack] = useState(false);
-  const [canGoForward, setCanGoForward] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -49,6 +49,9 @@ export default function ProjectPage({
 
       setProject(loadedProject);
       loadScenarios();
+      
+      // Scroll to top when page loads
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     // Check navigation history
@@ -72,6 +75,7 @@ export default function ProjectPage({
 
     const newScenario = scenarioStorage.create({
       projectId: project.id,
+      projectType: project.projectType,
       name: `Scenario ${scenarios.length + 1}`,
       unitSize: 50,
       unitsPerFloor: 8,
@@ -82,11 +86,17 @@ export default function ProjectPage({
         threeBedroom: 10,
       },
       sharedSpacePercentage: 20,
-      constructionCostPerSqm: 600,
+      numberOfUnits: 50,
+      lotSize: 200,
+      houseSize: 100,
+      apartmentUnits: 100,
+      singleFamilyUnits: 50,
+      constructionCostPerSqm: 400,
       infrastructureCosts: {
-        water: 50000,
-        sewer: 75000,
-        roads: 100000,
+        water: 15000,
+        sewer: 20000,
+        roads: 25000,
+        electricity: 18000,
       },
       finishLevel: "standard" as const,
     });
@@ -213,7 +223,7 @@ export default function ProjectPage({
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ProjectHeader - Shows project details */}
         <div className="mb-8">
-          <ProjectHeader project={project} />
+          <ProjectHeader project={project} scenarios={scenarios} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -221,19 +231,30 @@ export default function ProjectPage({
           <div className="lg:col-span-3">
             <Tabs
               value={activeTab}
-              onValueChange={setActiveTab}
+              onValueChange={(tab) => {
+                setActiveTab(tab);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
               className="space-y-6"
             >
-              <TabsList className="bg-white border border-slate-200">
-                <TabsTrigger value="scenarios">Scenarios</TabsTrigger>
-                <TabsTrigger value="simulator" disabled={!activeScenario}>
-                  Simulator
-                </TabsTrigger>
-                <TabsTrigger value="comparison" disabled={scenarios.length < 2}>
-                  Comparison
-                </TabsTrigger>
-                <TabsTrigger value="forecasting">Forecasting</TabsTrigger>
-              </TabsList>
+              <div className="relative group">
+                <TabsList className="bg-white border border-slate-200 rounded-lg overflow-x-auto overflow-y-hidden scrollbar-hide flex w-full md:w-auto md:flex-wrap px-1 py-1 gap-0.5"
+                  style={{
+                    scrollBehavior: 'smooth',
+                    WebkitOverflowScrolling: 'touch',
+                  }}
+                >
+                  <TabsTrigger value="scenarios" className="whitespace-nowrap text-xs sm:text-sm px-1.5 sm:px-3">Scenarios</TabsTrigger>
+                  <TabsTrigger value="simulator" disabled={!activeScenario} className="whitespace-nowrap text-xs sm:text-sm px-1.5 sm:px-3">
+                    Simulator
+                  </TabsTrigger>
+                  <TabsTrigger value="comparison" disabled={scenarios.length < 2} className="whitespace-nowrap text-xs sm:text-sm px-1.5 sm:px-3">
+                    Comparison
+                  </TabsTrigger>
+                  <TabsTrigger value="forecasting" className="whitespace-nowrap text-xs sm:text-sm px-1.5 sm:px-3">Forecasting</TabsTrigger>
+                  <TabsTrigger value="settings" className="whitespace-nowrap text-xs sm:text-sm px-1.5 sm:px-3">Settings</TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value="scenarios" className="space-y-6">
                 <div className="flex items-center justify-between">
@@ -285,6 +306,10 @@ export default function ProjectPage({
 
               <TabsContent value="forecasting">
                 <DemandForecasting project={project} scenarios={scenarios} />
+              </TabsContent>
+
+              <TabsContent value="settings">
+                <ProjectSettings project={project} onUpdate={() => window.location.reload()} />
               </TabsContent>
             </Tabs>
           </div>

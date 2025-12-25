@@ -11,34 +11,80 @@ export function calculateScenarioResults(
   landSize: number,
   costAssumptions: CostAssumptions,
 ): ScenarioResults {
-  // Calculate total units
-  const totalUnits = scenario.unitsPerFloor * scenario.numberOfFloors
+  let totalUnits = 0
+  let estimatedPopulation = 0
+  let builtUpArea = 0
 
-  // Calculate estimated population based on unit mix
-  const oneBedroomUnits = Math.round(totalUnits * (scenario.unitMix.oneBedroom / 100))
-  const twoBedroomUnits = Math.round(totalUnits * (scenario.unitMix.twoBedroom / 100))
-  const threeBedroomUnits = totalUnits - oneBedroomUnits - twoBedroomUnits
+  // Use custom assumptions if provided (scenario level > project level > country defaults)
+  const personsPerUnit = scenario.customAssumptions?.personsPerUnit || costAssumptions.personsPerUnit
+  const singleFamilyPersons = scenario.customAssumptions?.singleFamilyPersonsPerUnit || costAssumptions.singleFamilyPersonsPerUnit
 
-  const estimatedPopulation =
-    oneBedroomUnits * costAssumptions.personsPerUnit.oneBedroom +
-    twoBedroomUnits * costAssumptions.personsPerUnit.twoBedroom +
-    threeBedroomUnits * costAssumptions.personsPerUnit.threeBedroom
+  // Calculate based on project type
+  if (scenario.projectType === "apartment") {
+    // Apartment calculations - REQUIRE all values to be provided
+    if (!scenario.unitsPerFloor || !scenario.numberOfFloors) {
+      throw new Error("Apartment scenarios require unitsPerFloor and numberOfFloors")
+    }
+    
+    totalUnits = scenario.unitsPerFloor * scenario.numberOfFloors
 
-  // Calculate built-up area
-  const totalUnitArea = totalUnits * scenario.unitSize
-  const sharedArea = totalUnitArea * (scenario.sharedSpacePercentage / 100)
-  const builtUpArea = totalUnitArea + sharedArea
+    // Use provided unit mix percentages (no defaults)
+    if (!scenario.unitMix) {
+      throw new Error("Apartment scenarios require unitMix percentages")
+    }
+
+    const oneBedroomUnits = Math.round(totalUnits * (scenario.unitMix.oneBedroom / 100))
+    const twoBedroomUnits = Math.round(totalUnits * (scenario.unitMix.twoBedroom / 100))
+    const threeBedroomUnits = totalUnits - oneBedroomUnits - twoBedroomUnits
+
+    estimatedPopulation =
+      oneBedroomUnits * personsPerUnit.oneBedroom +
+      twoBedroomUnits * personsPerUnit.twoBedroom +
+      threeBedroomUnits * personsPerUnit.threeBedroom
+
+    const totalUnitArea = totalUnits * (scenario.unitSize || 50)
+    const sharedArea = totalUnitArea * ((scenario.sharedSpacePercentage || 20) / 100)
+    builtUpArea = totalUnitArea + sharedArea
+  } else if (scenario.projectType === "single-family") {
+    // Single-family home calculations - REQUIRE numberOfUnits
+    if (!scenario.numberOfUnits) {
+      throw new Error("Single-family scenarios require numberOfUnits")
+    }
+    
+    totalUnits = scenario.numberOfUnits
+    estimatedPopulation = totalUnits * singleFamilyPersons
+    builtUpArea = totalUnits * (scenario.houseSize || 100)
+  } else if (scenario.projectType === "mixed") {
+    // Mixed development calculations - REQUIRE both unit counts
+    if (!scenario.apartmentUnits || !scenario.singleFamilyUnits) {
+      throw new Error("Mixed scenarios require apartmentUnits and singleFamilyUnits")
+    }
+
+    const apartmentUnits = scenario.apartmentUnits
+    const singleFamilyUnits = scenario.singleFamilyUnits
+
+    totalUnits = apartmentUnits + singleFamilyUnits
+
+    // Apartments - use average occupancy from country data
+    const avgApartmentPopulation = apartmentUnits * ((personsPerUnit.oneBedroom + personsPerUnit.twoBedroom + personsPerUnit.threeBedroom) / 3)
+    const avgSingleFamilyPopulation = singleFamilyUnits * singleFamilyPersons
+
+    estimatedPopulation = Math.round(avgApartmentPopulation + avgSingleFamilyPopulation)
+    builtUpArea = apartmentUnits * 70 + singleFamilyUnits * 100
+  }
 
   // Calculate land coverage
-  const landCoveragePercentage = (builtUpArea / scenario.numberOfFloors / landSize) * 100
+  const landCoveragePercentage = (builtUpArea / landSize) * 100
 
-  // Determine density classification
+  // Determine density classification using configurable thresholds
   const unitsPerHectare = (totalUnits / landSize) * 10000
   let densityClassification: ScenarioResults["densityClassification"]
 
-  if (unitsPerHectare < 50) densityClassification = "low"
-  else if (unitsPerHectare < 150) densityClassification = "medium"
-  else if (unitsPerHectare < 300) densityClassification = "high"
+  const { low, medium, high } = costAssumptions.densityThresholds
+
+  if (unitsPerHectare < low) densityClassification = "low"
+  else if (unitsPerHectare < medium) densityClassification = "medium"
+  else if (unitsPerHectare < high) densityClassification = "high"
   else densityClassification = "very-high"
 
   // Calculate costs
@@ -63,13 +109,15 @@ export function calculateScenarioResults(
   const electricityDemand = estimatedPopulation * costAssumptions.electricityKwhPerPerson
   const wasteGeneration = estimatedPopulation * costAssumptions.wasteKgPerPerson
 
-  // Determine infrastructure status (simple rule-based)
+  // Determine infrastructure status using configurable thresholds
   const waterDemandM3 = dailyWaterDemand / 1000
+  const { waterDemandExceeds, waterDemandWarning, populationExceeds, populationWarning } = costAssumptions.infrastructureWarningLevels
+  
   let infrastructureStatus: ScenarioResults["infrastructureStatus"]
 
-  if (waterDemandM3 > 500 || estimatedPopulation > 2000) {
+  if (waterDemandM3 > waterDemandExceeds || estimatedPopulation > populationExceeds) {
     infrastructureStatus = "exceeds"
-  } else if (waterDemandM3 > 300 || estimatedPopulation > 1500) {
+  } else if (waterDemandM3 > waterDemandWarning || estimatedPopulation > populationWarning) {
     infrastructureStatus = "warning"
   } else {
     infrastructureStatus = "ok"

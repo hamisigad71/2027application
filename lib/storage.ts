@@ -184,26 +184,47 @@ export const costAssumptionsStorage = {
   },
 }
 
-// Default cost assumptions
-function getDefaultAssumptions(country: string): any {
-  // Default global assumptions - can be customized per country
+// Import country data
+import { getCountryData } from "./country-data"
+
+// Default cost assumptions - NOW COUNTRY-SPECIFIC
+function getDefaultAssumptions(countryCode: string): any {
+  const countryData = getCountryData(countryCode)
+  
   return {
-    country,
-    constructionCosts: {
-      basic: 400, // USD per sqm
-      standard: 600,
-      improved: 900,
+    country: countryCode,
+    constructionCosts: countryData.constructionCosts,
+    waterPerConnection: countryData.infrastructure.waterPerConnection,
+    sewerPerConnection: countryData.infrastructure.sewerPerConnection,
+    roadsPerMeter: countryData.infrastructure.roadsPerMeter,
+    personsPerUnit: countryData.occupancy,
+    singleFamilyPersonsPerUnit: 4, // Default average household size
+    waterLitersPerPerson: countryData.utilities.waterLitersPerPerson,
+    electricityKwhPerPerson: countryData.utilities.electricityKwhPerPerson,
+    wasteKgPerPerson: countryData.utilities.wasteKgPerPerson,
+    laborCostPercentage: countryData.laborCostPercentage,
+    // Density thresholds (units per hectare)
+    densityThresholds: {
+      low: 50,
+      medium: 150,
+      high: 300,
+      veryHigh: 500,
     },
-    waterPerConnection: 1500, // USD
-    sewerPerConnection: 2000, // USD
-    roadsPerMeter: 150, // USD
-    personsPerUnit: {
-      oneBedroom: 2,
-      twoBedroom: 3,
-      threeBedroom: 4,
+    // Infrastructure warning levels
+    infrastructureWarningLevels: {
+      waterDemandExceeds: 500,    // m³ per day
+      waterDemandWarning: 300,    // m³ per day
+      populationExceeds: 2000,     // population
+      populationWarning: 1500,     // population
     },
-    waterLitersPerPerson: 150,
-    electricityKwhPerPerson: 3,
-    wasteKgPerPerson: 0.8,
+    // Standard room sizes (m²)
+    roomSizes: {
+      masterBedroom: 20,
+      bedroom: 15,
+      livingRoom: 30,
+      kitchen: 15,
+      bathroom: 10,
+      hallway: 8,
+    },
   }
 }

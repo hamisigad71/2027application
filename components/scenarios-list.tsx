@@ -73,6 +73,16 @@ export function ScenariosList({
           over: "text-red-600",
         }[results.budgetStatus]
 
+        // Determine scenario description based on project type
+        let scenarioDescription = ""
+        if (project.projectType === "single-family") {
+          scenarioDescription = `${scenario.numberOfUnits || 50} homes • ${scenario.lotSize || 200}m² lot • ${scenario.houseSize || 100}m² house`
+        } else if (project.projectType === "apartment") {
+          scenarioDescription = `${scenario.numberOfFloors || 5} floors • ${scenario.unitsPerFloor || 8} units/floor`
+        } else if (project.projectType === "mixed") {
+          scenarioDescription = `${scenario.apartmentUnits || 100} apartments • ${scenario.singleFamilyUnits || 50} homes`
+        }
+
         return (
           <Card
             key={scenario.id}
@@ -86,7 +96,7 @@ export function ScenariosList({
                 <div className="flex-1">
                   <CardTitle className="text-lg text-slate-900">{scenario.name}</CardTitle>
                   <CardDescription className="mt-1">
-                    {scenario.numberOfFloors} floors • {scenario.unitsPerFloor} units/floor
+                    {scenarioDescription}
                   </CardDescription>
                 </div>
                 <DropdownMenu>
