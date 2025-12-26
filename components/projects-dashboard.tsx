@@ -20,6 +20,10 @@ import {
   Building,
   Menu,
   X,
+  Home as HomeIcon,
+  Lightbulb,
+  Layout,
+  Leaf,
 } from "lucide-react";
 import { CreateProjectDialog } from "./create-project-dialog";
 import { ProjectCard } from "./project-card";
@@ -122,6 +126,14 @@ export function ProjectsDashboard() {
             <div className="hidden sm:flex items-center gap-2 shrink-0">
               <Button
                 variant="ghost"
+                onClick={() => window.location.href = "/home-configurator"}
+                className="text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap"
+              >
+                <HomeIcon className="h-4 w-4 mr-2" />
+                Home Builder
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() => setShowProfile(true)}
                 className="text-slate-600 hover:text-slate-900 hover:bg-slate-100 whitespace-nowrap"
               >
@@ -155,6 +167,17 @@ export function ProjectsDashboard() {
           {/* Mobile Menu Dropdown */}
           {mobileMenuOpen && (
             <div className="sm:hidden mt-3 pb-3 border-t border-slate-200 pt-3 space-y-2 animate-in slide-in-from-top-2">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  window.location.href = "/home-configurator";
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full justify-start text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              >
+                <HomeIcon className="h-4 w-4 mr-2" />
+                Home Builder
+              </Button>
               <Button
                 variant="ghost"
                 onClick={() => {
@@ -331,83 +354,126 @@ export function ProjectsDashboard() {
             )}
           </div>
 
-          <div className="space-y-6">
-            {/* Recent Activity */}
-            <Card className="border-0 shadow-md">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-900" />
-                  <CardTitle className="text-lg">Recent Activity</CardTitle>
+         <div className="space-y-6">
+  {/* Recent Activity – Enhanced with modern timeline style */}
+  <Card className="border-0 shadow-lg overflow-hidden bg-white/80 backdrop-blur-sm">
+    <CardHeader className="bg-gradient-to-r from-blue-900 to-blue-800 text-white pb-6">
+      <div className="flex items-center gap-3 pt-4">
+        <div className="p-2 bg-white/20 rounded-lg">
+          <Calendar className="h-6 w-6" />
+        </div>
+        <CardTitle className="text-xl font-semibold">Recent Activity</CardTitle>
+      </div>
+    </CardHeader>
+    <CardContent className="pt-6">
+      {recentProjects.length > 0 ? (
+        <div className="relative">
+          {/* Vertical timeline line */}
+          <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-blue-200" />
+          <div className="space-y-5">
+            {recentProjects.map((project, index) => (
+              <div key={project.id} className="relative flex gap-4">
+                {/* Timeline dot */}
+                <div className="shrink-0 w-10 h-10 rounded-full bg-blue-900 flex items-center justify-center shadow-md z-10 ring-4 ring-white">
+                  <div className="w-3 h-3 rounded-full bg-white" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                {recentProjects.length > 0 ? (
-                  <div className="space-y-3">
-                    {recentProjects.map((project) => (
-                      <div
-                        key={project.id}
-                        className="flex items-start gap-3 pb-3 border-b border-slate-100 last:border-0 last:pb-0"
-                      >
-                        <div className="w-2 h-2 rounded-full bg-blue-900 mt-2" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-900 truncate">
-                            {project.name}
-                          </p>
-                          <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                            <MapPin className="h-3 w-3" />
-                            {project.location.city}
-                          </p>
-                        </div>
-                        <span className="text-xs text-slate-400 whitespace-nowrap">
-                          {new Date(project.updatedAt).toLocaleDateString(
-                            "en-US",
-                            { month: "short", day: "numeric" }
-                          )}
-                        </span>
-                      </div>
-                    ))}
+                {/* Content */}
+                <div className="flex-1 bg-slate-50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 border border-slate-100">
+                  <p className="font-semibold text-slate-900 truncate">
+                    {project.name}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-1 text-sm text-slate-600">
+                    <MapPin className="h-4 w-4 text-blue-700" />
+                    <span>{project.location.city}</span>
                   </div>
-                ) : (
-                  <p className="text-sm text-slate-500 text-center py-8">
-                    No recent activity
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Quick Tips */}
-            <Card className="border-0 shadow-md bg-linear-to-br from-blue-50 to-slate-50">
-              <CardHeader>
-                <CardTitle className="text-lg text-blue-900">
-                  Quick Tips
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-slate-700">
-                <div className="flex gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-900 mt-1.5 shrink-0" />
-                  <p className="leading-relaxed">
-                    Create multiple scenarios to compare different layout
-                    approaches
-                  </p>
+                  <div className="mt-2 text-xs text-slate-500 bg-white/60 inline-block px-3 py-1 rounded-full">
+                    {new Date(project.updatedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}{" "}
+                    •{" "}
+                    {new Date(project.updatedAt).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-900 mt-1.5 shrink-0" />
-                  <p className="leading-relaxed">
-                    Use demand forecasting to plan for future housing needs
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-900 mt-1.5 shrink-0" />
-                  <p className="leading-relaxed">
-                    Monitor infrastructure impact to ensure sustainable
-                    development
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            ))}
           </div>
         </div>
-      </main>
+      ) : (
+        <div className="text-center py-12">
+          <div className="inline-flex p-4 bg-slate-100 rounded-full mb-4">
+            <Calendar className="h-10 w-10 text-slate-400" />
+          </div>
+          <p className="text-slate-500 font-medium">No recent activity yet</p>
+          <p className="text-sm text-slate-400 mt-2">Your project updates will appear here</p>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+
+  {/* Quick Tips – Creative pill-style cards with icons */}
+  <Card className="border-0 shadow-xl overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    {/* Enhanced Header with subtle wave background */}
+    <CardHeader className="relative bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 text-white overflow-hidden">
+      <div className="absolute inset-0 opacity-20">
+        {/* Optional: add a subtle SVG wave or pattern here for extra flair */}
+        <div className="absolute bottom-0 left-0 w-full h-20 bg-white/10 rounded-t-full blur-3xl" />
+      </div>
+      <div className="relative flex items-center justify-between py-6">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-white/25 backdrop-blur-sm rounded-2xl shadow-lg">
+            <Lightbulb className="h-8 w-8" />
+          </div>
+          <div>
+            <CardTitle className="text-2xl font-bold">Quick Tips</CardTitle>
+            <p className="text-sm text-white/80 mt-1">Boost your planning efficiency</p>
+          </div>
+        </div>
+        {/* Decorative floating sparkles */}
+        <div className="hidden md:block">
+          <div className="flex gap-2">
+            <div className="w-2 h-2 bg-white/40 rounded-full animate-pulse" />
+            <div className="w-3 h-3 bg-white/60 rounded-full animate-pulse delay-75" />
+            <div className="w-2 h-2 bg-white/40 rounded-full animate-pulse delay-150" />
+          </div>
+        </div>
+      </div>
+    </CardHeader>
+
+    <CardContent className="pt-10 pb-12 px-6 md:px-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {/* Tip 1 */}
+        <div className="group relative bg-white/80 backdrop-blur-md rounded-3xl p-7 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-white/60 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-300/20 via-transparent to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative z-10 flex flex-col h-full">
+            <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl w-fit mb-5 group-hover:scale-110 transition-transform duration-300">
+              <Layout className="h-8 w-8 text-blue-800" />
+            </div>
+            <p className="text-lg font-medium text-slate-800 leading-relaxed">
+              Create multiple scenarios to compare different layout approaches
+            </p>
+            <div className="mt-6 flex items-center text-sm text-blue-600 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+              Explore scenarios →
+            </div>
+          </div>
+        </div>
+
+        {/* Tip 2 and Tip 3 — same structure */}
+        {/* ... (keep your existing Tip 2 and 3) ... */}
+
+      </div>
+
+      <div className="mt-10 text-center">
+        <p className="text-sm text-slate-500">More tips unlock as you create projects</p>
+      </div>
+    </CardContent>
+  </Card>
+</div>
+        </div>
 
       {/* Create Project Dialog */}
       <CreateProjectDialog
@@ -418,6 +484,7 @@ export function ProjectsDashboard() {
 
       {/* UserProfile Modal */}
       {showProfile && <UserProfile onClose={() => setShowProfile(false)} />}
+    </main>
     </div>
   );
 }

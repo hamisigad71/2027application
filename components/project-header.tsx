@@ -81,13 +81,13 @@ export function ProjectHeader({ project, scenarios = [] }: ProjectHeaderProps) {
 
             {/* Project Type */}
             <div className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-300">
-              <div className="h-2 bg-gradient-to-r from-blue-400 to-blue-500"></div>
+              <div className="h-2 bg-gradient-to-r from-slate-400 to-slate-500"></div>
               <div className="p-4 md:p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-150 transition-colors">
-                    <Home className="h-5 w-5 text-blue-600" />
+                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                    <Home className="h-5 w-5 text-slate-600" />
                   </div>
-                  <span className="text-xs font-bold text-blue-600 uppercase tracking-wide">Type</span>
+                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wide">Type</span>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs md:text-sm text-slate-500 font-medium">Project</p>
@@ -98,13 +98,13 @@ export function ProjectHeader({ project, scenarios = [] }: ProjectHeaderProps) {
 
             {/* Target Income */}
             <div className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-300">
-              <div className="h-2 bg-gradient-to-r from-teal-400 to-teal-500"></div>
+              <div className="h-2 bg-gradient-to-r from-slate-400 to-slate-500"></div>
               <div className="p-4 md:p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center group-hover:bg-teal-150 transition-colors">
-                    <Users className="h-5 w-5 text-teal-600" />
+                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
+                    <Users className="h-5 w-5 text-slate-600" />
                   </div>
-                  <span className="text-xs font-bold text-teal-600 uppercase tracking-wide">Target</span>
+                  <span className="text-xs font-bold text-slate-600 uppercase tracking-wide">Target</span>
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs md:text-sm text-slate-500 font-medium">Income</p>

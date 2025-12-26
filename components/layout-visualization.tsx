@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Scenario, ScenarioResults } from "@/lib/types"
 import { useState } from "react"
+import { Maximize2 } from "lucide-react"
 
 interface LayoutVisualizationProps {
   scenario: Scenario
@@ -110,220 +111,170 @@ export function LayoutVisualization({ scenario, results, roomSizes }: LayoutVisu
   }
 
   const renderSingleFamilyLayout = () => {
-    // Single family home - show ONE detailed house with room layout
-    const lotSize = scenario.lotSize || 500 // Standard residential lot
-    const houseSize = scenario.houseSize || 120 // Total built area
-    const bedrooms = Math.round(houseSize / 30) // Estimate based on size
-    
-    // Use user-provided room sizes
+    const lotSize = scenario.lotSize || 500
+    const houseSize = scenario.houseSize || 120
+    const bedrooms = Math.round(houseSize / 30)
     const masterBedroom = rooms.masterBedroom
     const bedroom2 = rooms.bedroom
-    const bedroom3 = rooms.bedroom
     const livingRoom = rooms.livingRoom
     const kitchen = rooms.kitchen
-    const diningArea = 10 // m² - not in standard config
     const bathrooms = rooms.bathroom
-    const hallway = rooms.hallway
+    const coverage = ((houseSize / lotSize) * 100).toFixed(1)
+    const greenSpace = (100 - parseFloat(coverage)).toFixed(1)
 
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Site Plan - Takes up 2 columns on desktop, full width on mobile */}
-        <div className="lg:col-span-3">
-          <div className="rounded-lg border-2 border-blue-400 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
-            <div className="relative bg-gradient-to-br from-green-100 via-emerald-50 to-green-100 p-8 min-h-96 flex flex-col items-center justify-center">
-              {/* Title */}
-              <div className="absolute top-3 left-4 text-sm font-bold text-slate-800">
-                SINGLE FAMILY HOME - SITE PLAN & LAYOUT
-              </div>
+      <div className="space-y-6">
+        {/* Layout Visualization Card */}
+        <Card className="border-0 shadow-xl overflow-hidden bg-white">
+          <CardHeader className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Maximize2 className="w-5 h-5" />
+              Your Home Layout
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-8 pb-8">
+            <div className="flex justify-center">
+              <div className="relative w-full">
+                {/* Lot Boundary */}
+                <div
+                  className="border-4 border-dashed border-amber-700 relative flex items-center justify-center bg-gradient-to-b from-green-100 to-emerald-50 p-4 mx-auto"
+                  style={{
+                    width: "300px",
+                    height: "300px",
+                  }}
+                >
+                  <div className="absolute top-3 left-4 text-xs font-bold text-amber-900">
+                    LAND: {lotSize}m²
+                  </div>
 
-              {/* Lot Boundary */}
-              <div className="flex justify-center items-center w-full h-full">
-                <div className="relative">
-                  {/* Land/Lot */}
+                  {/* House */}
                   <div
-                    className="border-4 border-amber-700 dashed relative flex items-center justify-center bg-gradient-to-b from-green-200 to-emerald-100"
+                    className="border-2 border-slate-800 bg-gradient-to-br from-orange-300 to-orange-400 relative shadow-lg"
                     style={{
-                      width: "320px",
-                      height: "320px",
+                      width: "280px",
+                      height: "220px",
                     }}
                   >
-                    {/* Lot label */}
-                    <div className="absolute top-2 left-2 text-xs font-bold text-amber-900">
-                      LOT: {lotSize}m²
-                    </div>
-
-                    {/* House centered on lot */}
-                    <div
-                      className="border-2 border-slate-800 bg-gradient-to-br from-orange-300 to-orange-400 relative shadow-lg"
-                      style={{
-                        width: "220px",
-                        height: "180px",
-                      }}
-                      onMouseEnter={() => setHoveredUnit("main-house")}
-                      onMouseLeave={() => setHoveredUnit(null)}
-                    >
-                      {/* House rooms layout */}
-                      <div className="absolute inset-0 grid grid-cols-2 gap-1 p-2">
-                        {/* Master Bedroom */}
-                        <div className="bg-blue-300 border border-blue-600 rounded p-1 col-span-1 row-span-1 flex flex-col items-center justify-center">
-                          <div className="text-xs font-bold text-blue-900">Master</div>
-                          <div className="text-xs text-blue-900">20m²</div>
-                        </div>
-
-                        {/* Bedroom 2 */}
-                        <div className="bg-blue-300 border border-blue-600 rounded p-1 flex flex-col items-center justify-center">
-                          <div className="text-xs font-bold text-blue-900">Bed 2</div>
-                          <div className="text-xs text-blue-900">15m²</div>
-                        </div>
-
-                        {/* Living Room - spans 2 columns */}
-                        <div className="bg-yellow-300 border border-yellow-600 rounded p-1 col-span-2 flex flex-col items-center justify-center">
-                          <div className="text-xs font-bold text-yellow-900">Living/Dining</div>
-                          <div className="text-xs text-yellow-900">40m²</div>
-                        </div>
-
-                        {/* Kitchen */}
-                        <div className="bg-red-300 border border-red-600 rounded p-1 flex flex-col items-center justify-center">
-                          <div className="text-xs font-bold text-red-900">Kitchen</div>
-                          <div className="text-xs text-red-900">15m²</div>
-                        </div>
-
-                        {/* Bathrooms */}
-                        <div className="bg-purple-300 border border-purple-600 rounded p-1 flex flex-col items-center justify-center">
-                          <div className="text-xs font-bold text-purple-900">Bath (2)</div>
-                          <div className="text-xs text-purple-900">10m²</div>
-                        </div>
+                    {/* Rooms Grid */}
+                    <div className="absolute inset-0 grid grid-cols-3 gap-1 p-2">
+                      {/* Master Bedroom */}
+                      <div className="bg-blue-400 border border-blue-600 rounded p-1 col-span-1 row-span-2 flex flex-col items-center justify-center">
+                        <div className="text-xs font-bold text-blue-900">Master</div>
+                        <div className="text-xs text-blue-900">{masterBedroom}m²</div>
                       </div>
 
-                      {/* House label */}
-                      <div className="absolute top-1 right-1 bg-white rounded px-1 text-xs font-bold text-slate-800">
-                        {houseSize}m²
+                      {/* Bed 2 */}
+                      <div className="bg-blue-400 border border-blue-600 rounded p-1 flex flex-col items-center justify-center">
+                        <div className="text-xs font-bold text-blue-900">Bed 2</div>
+                        <div className="text-xs text-blue-900">{bedroom2}m²</div>
+                      </div>
+
+                      {/* Living */}
+                      <div className="bg-yellow-300 border border-yellow-600 rounded p-1 col-span-2 row-span-2 flex flex-col items-center justify-center">
+                        <div className="text-xs font-bold text-yellow-900">Living/Dining</div>
+                        <div className="text-xs text-yellow-900">{livingRoom}m²</div>
+                      </div>
+
+                      {/* Kitchen */}
+                      <div className="bg-red-400 border border-red-600 rounded p-1 flex flex-col items-center justify-center">
+                        <div className="text-xs font-bold text-red-900">Kitchen</div>
+                        <div className="text-xs text-red-900">{kitchen}m²</div>
+                      </div>
+
+                      {/* Bath */}
+                      <div className="bg-purple-400 border border-purple-600 rounded p-1 col-span-1 flex flex-col items-center justify-center">
+                        <div className="text-xs font-bold text-purple-900">Bath</div>
+                        <div className="text-xs text-purple-900">{bathrooms}m²</div>
                       </div>
                     </div>
 
-                    {/* Yard areas labels */}
-                    <div className="absolute bottom-2 left-2 text-xs text-emerald-900 font-semibold">
-                      Front Yard
-                    </div>
-                    <div className="absolute bottom-2 right-2 text-xs text-emerald-900 font-semibold">
-                      Back Yard
-                    </div>
-                    <div className="absolute top-2 right-2 text-xs text-emerald-900 font-semibold">
-                      Side Yard
+                    <div className="absolute top-1 right-1 bg-white rounded px-2 py-1 text-xs font-bold text-slate-800">
+                      {houseSize}m²
                     </div>
                   </div>
+
+                  {/* Yard Labels */}
+                  <div className="absolute bottom-2 left-3 text-xs text-emerald-900 font-semibold">Front</div>
+                  <div className="absolute bottom-2 right-3 text-xs text-emerald-900 font-semibold">Back</div>
+                  <div className="absolute top-3 right-3 text-xs text-emerald-900 font-semibold">Side</div>
                 </div>
               </div>
-
             </div>
+
+            {/* Layout Stats */}
+            <div className="relative mt-6">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+    {/* Land Coverage Card */}
+    <div className="bg-blue-50 rounded-lg border border-blue-200 p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+      <div className="text-sm text-slate-600 font-semibold">Land Coverage</div>
+      <div className="text-3xl font-bold text-blue-600 mt-2">{coverage}%</div>
+    </div>
+
+    {/* Green Space Card */}
+    <div className="bg-emerald-50 rounded-lg border border-emerald-200 p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+      <div className="text-sm text-slate-600 font-semibold">Green Space</div>
+      <div className="text-3xl font-bold text-emerald-600 mt-2">{greenSpace}%</div>
+    </div>
+
+    {/* Building Area Card */}
+    <div className="bg-amber-50 rounded-lg border border-amber-200 p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+      <div className="text-sm text-slate-600 font-semibold">Building Area</div>
+      <div className="text-3xl font-bold text-amber-600 mt-2">{houseSize} m²</div>
+    </div>
+  </div>
+</div>
+          </CardContent>
+        </Card>
+
+        {/* Key Metrics */}
+        <div className="grid grid-cols-3 gap-4 mt-6">
+          <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Bedrooms</div>
+            <div className="text-3xl font-bold text-blue-600 flex-grow">{bedrooms}</div>
+            <div className="text-xs text-slate-400 mt-1">Total count</div>
+          </div>
+          <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Bathrooms</div>
+            <div className="text-3xl font-bold text-indigo-600 flex-grow">2</div>
+            <div className="text-xs text-slate-400 mt-1">Total count</div>
+          </div>
+          <div className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Lot Size</div>
+            <div className="text-2xl font-bold text-emerald-600 flex-grow">{lotSize}m²</div>
+            <div className="text-xs text-slate-400 mt-1">Total area</div>
           </div>
         </div>
 
-        {/* Details Panel - Shows on click, appears on right on desktop, below on mobile */}
-        <div className="lg:col-span-1">
-          <button
-            onClick={() => setShowDetailsPanel(!showDetailsPanel)}
-            className="w-full mb-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-all shadow-md"
-          >
-            {showDetailsPanel ? "Hide Details" : "View Details"}
-          </button>
-          {showDetailsPanel && (
-          <div className="space-y-4 max-h-fit">
-            {/* Legend Card */}
-            <div className="bg-white rounded-lg p-4 border-2 border-gray-300 shadow-md">
-              <h4 className="font-bold text-slate-800 mb-3 text-sm">ROOM TYPES & LEGEND</h4>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-blue-300 border border-blue-600 rounded" />
-                  <span className="text-xs text-slate-700">Bedrooms</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-yellow-300 border border-yellow-600 rounded" />
-                  <span className="text-xs text-slate-700">Living/Dining</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-red-300 border border-red-600 rounded" />
-                  <span className="text-xs text-slate-700">Kitchen</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-purple-300 border border-purple-600 rounded" />
-                  <span className="text-xs text-slate-700">Bathrooms</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-green-200 border border-green-600 rounded" />
-                  <span className="text-xs text-slate-700">Yard/Green Space</span>
-                </div>
+        {/* Room Details */}
+        <Card className="border-0 shadow-xl bg-white">
+          <CardHeader className="bg-gradient-to-r from-slate-500 to-slate-600 text-white">
+            <CardTitle className="text-lg">Room Breakdown</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <span className="font-semibold text-slate-900">Master Bedroom</span>
+                <span className="text-lg font-bold text-blue-600">{masterBedroom}m²</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <span className="font-semibold text-slate-900">Bedroom 2</span>
+                <span className="text-lg font-bold text-blue-600">{bedroom2}m²</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <span className="font-semibold text-slate-900">Living/Dining</span>
+                <span className="text-lg font-bold text-yellow-600">{livingRoom}m²</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg border border-red-200">
+                <span className="font-semibold text-slate-900">Kitchen</span>
+                <span className="text-lg font-bold text-red-600">{kitchen}m²</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg border border-purple-200">
+                <span className="font-semibold text-slate-900">Bathrooms</span>
+                <span className="text-lg font-bold text-purple-600">{bathrooms}m²</span>
               </div>
             </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-3 bg-orange-50 rounded-lg border-2 border-orange-300">
-                <div className="text-xs text-slate-600 font-semibold">House Size</div>
-                <div className="text-lg font-bold text-orange-600">{houseSize}m²</div>
-              </div>
-              <div className="p-3 bg-green-50 rounded-lg border-2 border-green-300">
-                <div className="text-xs text-slate-600 font-semibold">Lot Size</div>
-                <div className="text-lg font-bold text-green-600">{lotSize}m²</div>
-              </div>
-              <div className="p-3 bg-blue-50 rounded-lg border-2 border-blue-300">
-                <div className="text-xs text-slate-600 font-semibold">Bedrooms</div>
-                <div className="text-lg font-bold text-blue-600">{bedrooms}</div>
-              </div>
-              <div className="p-3 bg-purple-50 rounded-lg border-2 border-purple-300">
-                <div className="text-xs text-slate-600 font-semibold">Bathrooms</div>
-                <div className="text-lg font-bold text-purple-600">2</div>
-              </div>
-            </div>
-
-            {/* Room Details */}
-            <div className="bg-slate-50 rounded-lg p-3 border-2 border-slate-300">
-              <h5 className="font-bold text-slate-800 mb-2 text-xs">ROOM SIZES</h5>
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between p-1 bg-blue-100 rounded">
-                  <span className="text-blue-900">Master Bedroom</span>
-                  <span className="font-bold text-blue-900">{masterBedroom}m²</span>
-                </div>
-                <div className="flex justify-between p-1 bg-blue-100 rounded">
-                  <span className="text-blue-900">Bedroom 2</span>
-                  <span className="font-bold text-blue-900">{bedroom2}m²</span>
-                </div>
-                <div className="flex justify-between p-1 bg-yellow-100 rounded">
-                  <span className="text-yellow-900">Living/Dining</span>
-                  <span className="font-bold text-yellow-900">{livingRoom + diningArea}m²</span>
-                </div>
-                <div className="flex justify-between p-1 bg-red-100 rounded">
-                  <span className="text-red-900">Kitchen</span>
-                  <span className="font-bold text-red-900">{kitchen}m²</span>
-                </div>
-                <div className="flex justify-between p-1 bg-purple-100 rounded">
-                  <span className="text-purple-900">Bathrooms (2)</span>
-                  <span className="font-bold text-purple-900">{bathrooms}m²</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Coverage Stats */}
-            <div className="bg-emerald-50 rounded-lg p-3 border-2 border-emerald-300">
-              <h5 className="font-bold text-emerald-800 mb-2 text-xs">LAND USE</h5>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-emerald-900">Built-up Area</span>
-                  <span className="font-bold text-emerald-900">{Math.round((houseSize / lotSize) * 100)}%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-emerald-900">Open Space</span>
-                  <span className="font-bold text-emerald-900">{Math.round(((lotSize - houseSize) / lotSize) * 100)}%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-emerald-900">Yard Area</span>
-                  <span className="font-bold text-emerald-900">{lotSize - houseSize}m²</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }

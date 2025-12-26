@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import type { HomeBuilderConfig, HomeSpecification } from "@/lib/types"
 import { calculateHomeSpecification } from "@/lib/calculations"
 import { getAvailableCountries } from "@/lib/country-data"
-import { DollarSign, Home, Zap, Droplet, TreePine, Car, Lightbulb, ArrowLeft, Bed, Maximize2, Download, Building2, MapPin } from "lucide-react"
+import { DollarSign, Home, Zap, Droplet, TreePine, Car, Lightbulb, ArrowLeft, Bed, Maximize2, Download, Building2, MapPin, Shuffle } from "lucide-react"
 
 export function HomeConfigurator() {
   const [config, setConfig] = useState<HomeBuilderConfig & { bedrooms?: number }>({
@@ -35,6 +35,7 @@ export function HomeConfigurator() {
   })
 
   const [specification, setSpecification] = useState<HomeSpecification | null>(null)
+  const [layoutVariant, setLayoutVariant] = useState<number>(0)
   const countries = getAvailableCountries()
 
   const handleCalculate = () => {
@@ -64,6 +65,10 @@ export function HomeConfigurator() {
     link.click()
   }
 
+  const handleShuffleLayout = () => {
+    setLayoutVariant((prev) => (prev + 1) % 3)
+  }
+
   const budgetStatus = specification
     ? specification.percentageUsed > 100
       ? "over"
@@ -73,14 +78,22 @@ export function HomeConfigurator() {
     : null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+    <div className="min-h-screen bg-white">
+      {/* Subtle animated background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-50">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600 rounded-full mix-blend-screen filter blur-3xl opacity-5 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-700 rounded-full mix-blend-screen filter blur-3xl opacity-5 animate-blob animation-delay-2000"></div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10">
       {/* NAVBAR */}
-      <nav className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-lg">
+      <nav className="relative z-20 bg-white border-b border-slate-200 sticky top-0 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
-                <Home className="w-6 h-6 text-white" />
+              <div className="w-11 h-11 rounded-lg bg-slate-200 flex items-center justify-center shadow-sm">
+                <Home className="w-6 h-6 text-slate-700" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-slate-900">Home Builder</h1>
@@ -90,7 +103,7 @@ export function HomeConfigurator() {
             <Button
               onClick={() => window.location.href = "/"}
               variant="ghost"
-              className="text-slate-600 hover:text-slate-900"
+              className="text-slate-600 hover:text-slate-900 hover:bg-slate-100"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
@@ -100,12 +113,31 @@ export function HomeConfigurator() {
       </nav>
 
       {/* HERO SECTION */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 text-white py-16 md:py-20 border-b border-slate-600">
+        {/* Subtle Background Elements */}
+        <div className="absolute inset-0 overflow-hidden opacity-40">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-600 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-700 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Design Your Dream Home</h2>
-            <p className="text-lg text-blue-100 max-w-2xl mx-auto">
+            {/* Animated Badge */}
+            <div className="inline-flex items-center gap-2 bg-slate-600/30 backdrop-blur-sm border border-slate-500/50 rounded-full px-4 py-2 mb-6 text-sm font-semibold text-slate-200">
+              <span className="w-2 h-2 bg-slate-400 rounded-full animate-pulse"></span>
+              Design & Build Smarter
+            </div>
+
+            {/* Main Headline */}
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 text-white drop-shadow-lg">
+              Design Your Dream Home
+            </h2>
+            
+            <p className="text-lg md:text-xl text-slate-200 max-w-3xl mx-auto leading-relaxed mb-2">
               Configure your preferences and get instant cost estimates, detailed layouts, and maintenance projections.
+            </p>
+            <p className="text-sm md:text-base text-slate-300 max-w-2xl mx-auto opacity-90">
+              From budget planning to final floor plans - all in one powerful tool
             </p>
           </div>
         </div>
@@ -117,8 +149,8 @@ export function HomeConfigurator() {
           {/* LEFT PANEL */}
           <div className="lg:col-span-5 space-y-6">
             {/* Location & Budget */}
-            <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow bg-white">
-              <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-t-lg">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-white border border-slate-200">
+              <CardHeader className="bg-slate-100 text-slate-900 rounded-t-lg border-b border-slate-200">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <MapPin className="w-5 h-5" />
                   Location & Budget
@@ -163,8 +195,8 @@ export function HomeConfigurator() {
             </Card>
 
             {/* Style & Design */}
-            <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow bg-white">
-              <CardHeader className="bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-t-lg">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-white border border-slate-200">
+              <CardHeader className="bg-slate-100 text-slate-900 rounded-t-lg border-b border-slate-200">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Lightbulb className="w-5 h-5" />
                   Style & Design
@@ -224,8 +256,8 @@ export function HomeConfigurator() {
             </Card>
 
             {/* Features */}
-            <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow bg-white">
-              <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-t-lg">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-all duration-300 bg-white border border-slate-200">
+              <CardHeader className="bg-slate-100 text-slate-900 rounded-t-lg border-b border-slate-200">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Zap className="w-5 h-5" />
                   Premium Features
@@ -241,14 +273,14 @@ export function HomeConfigurator() {
                     { key: "garage", label: "Garage", icon: Car, cost: 12000 },
                     { key: "garden", label: "Garden", icon: TreePine, cost: 4000 },
                   ].map(({ key, label, cost }) => (
-                    <label key={key} className={`flex flex-col items-center p-3 rounded-lg cursor-pointer transition-all border-2 ${
+                    <label key={key} className={`flex flex-col items-center p-4 rounded-lg cursor-pointer transition-all duration-300 border-2 font-medium ${
                       config.features[key as keyof typeof config.features]
-                        ? "border-purple-500 bg-purple-50"
-                        : "border-slate-200 hover:border-slate-300"
+                        ? "border-slate-400 bg-slate-50 shadow-sm"
+                        : "border-slate-300 hover:border-slate-400 hover:bg-slate-50"
                     }`}>
-                      <input type="checkbox" checked={config.features[key as keyof typeof config.features]} onChange={() => handleFeatureToggle(key as keyof typeof config.features)} className="mb-2" />
-                      <span className="text-xs font-semibold text-slate-900 text-center">{label}</span>
-                      <span className="text-xs text-slate-500 mt-1">${(cost / 1000).toFixed(0)}k</span>
+                      <input type="checkbox" checked={config.features[key as keyof typeof config.features]} onChange={() => handleFeatureToggle(key as keyof typeof config.features)} className="mb-3" />
+                      <span className="text-sm font-bold text-slate-900 text-center">{label}</span>
+                      <span className={`text-xs mt-1 font-semibold ${config.features[key as keyof typeof config.features] ? "text-slate-700" : "text-slate-500"}`}>+${(cost / 1000).toFixed(0)}k</span>
                     </label>
                   ))}
                 </div>
@@ -257,12 +289,12 @@ export function HomeConfigurator() {
 
             {/* Buttons */}
             <div className="flex gap-3 sticky bottom-4">
-              <Button onClick={handleCalculate} className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-6 text-lg font-bold shadow-xl">
+              <Button onClick={handleCalculate} className="flex-1 bg-slate-700 hover:bg-slate-800 text-white py-6 text-lg font-bold shadow-md transition-all duration-300">
                 <Building2 className="w-5 h-5 mr-2" />
                 Calculate & Design
               </Button>
               {specification && (
-                <Button onClick={handleExportPDF} className="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white py-6 text-lg font-bold shadow-xl">
+                <Button onClick={handleExportPDF} className="flex-1 bg-slate-600 hover:bg-slate-700 text-white py-6 text-lg font-bold shadow-md transition-all duration-300">
                   <Download className="w-5 h-5 mr-2" />
                   Export PDF
                 </Button>
@@ -286,23 +318,54 @@ export function HomeConfigurator() {
               <>
                 {/* Layout Visualization */}
                 <Card className="border-0 shadow-xl overflow-hidden bg-white">
-                  <CardHeader className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
+                  <CardHeader className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white flex items-center justify-between">
                     <CardTitle className="text-lg flex items-center gap-2">
                       <Maximize2 className="w-5 h-5" />
-                      Your Home Layout
+                      Your Home Layout (Variant {layoutVariant + 1}/3)
                     </CardTitle>
+                    <Button
+                      onClick={handleShuffleLayout}
+                      className="bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                      size="sm"
+                    >
+                      <Shuffle className="w-4 h-4 mr-1" />
+                      Shuffle
+                    </Button>
                   </CardHeader>
                   <CardContent className="pt-8 pb-8">
                     <div className="flex justify-center">
                       <div className="border-4 border-dashed border-amber-700 relative flex items-center justify-center bg-gradient-to-b from-green-100 to-emerald-50 p-8" style={{ width: "400px", height: "400px" }}>
                         <div className="absolute top-3 left-4 text-xs font-bold text-amber-900">LAND: {config.landSize}m²</div>
                         <div className="border-2 border-slate-800 bg-gradient-to-br from-orange-300 to-orange-400 relative shadow-lg" style={{ width: "280px", height: "220px" }}>
-                          <div className="absolute inset-0 grid grid-cols-3 gap-1 p-2">
-                            <div className="bg-blue-400 border border-blue-600 rounded p-1 col-span-1 row-span-2 flex flex-col items-center justify-center"><div className="text-xs font-bold text-blue-900">Master</div></div>
-                            <div className="bg-blue-400 border border-blue-600 rounded p-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-blue-900">Bed 2</div></div>
-                            <div className="bg-yellow-300 border border-yellow-600 rounded p-1 col-span-2 row-span-2 flex flex-col items-center justify-center"><div className="text-xs font-bold text-yellow-900">Living</div></div>
-                            <div className="bg-red-400 border border-red-600 rounded p-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-red-900">Kitchen</div></div>
-                            <div className="bg-purple-400 border border-purple-600 rounded p-1 col-span-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-purple-900">Bath</div></div>
+                          <div className="absolute inset-0 grid gap-1 p-2" style={{ gridTemplateColumns: layoutVariant === 0 ? "1fr 1fr 1fr" : layoutVariant === 1 ? "1fr 1fr" : "2fr 1fr" }}>
+                            {layoutVariant === 0 ? (
+                              // Layout 1: Traditional 3-column
+                              <>
+                                <div className="bg-blue-400 border border-blue-600 rounded p-1 row-span-2 flex flex-col items-center justify-center"><div className="text-xs font-bold text-blue-900">Master</div></div>
+                                <div className="bg-blue-400 border border-blue-600 rounded p-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-blue-900">Bed 2</div></div>
+                                <div className="bg-yellow-300 border border-yellow-600 rounded p-1 row-span-2 flex flex-col items-center justify-center"><div className="text-xs font-bold text-yellow-900">Living</div></div>
+                                <div className="bg-red-400 border border-red-600 rounded p-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-red-900">Kitchen</div></div>
+                                <div className="bg-purple-400 border border-purple-600 rounded p-1 col-span-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-purple-900">Bath</div></div>
+                              </>
+                            ) : layoutVariant === 1 ? (
+                              // Layout 2: Open concept
+                              <>
+                                <div className="bg-blue-400 border border-blue-600 rounded p-1 col-span-1 row-span-2 flex flex-col items-center justify-center"><div className="text-xs font-bold text-blue-900">Master</div></div>
+                                <div className="bg-yellow-300 border border-yellow-600 rounded p-1 col-span-1 row-span-2 flex flex-col items-center justify-center"><div className="text-xs font-bold text-yellow-900">Living/Dining</div></div>
+                                <div className="bg-red-400 border border-red-600 rounded p-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-red-900">Kitchen</div></div>
+                                <div className="bg-blue-400 border border-blue-600 rounded p-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-blue-900">Bed 2</div></div>
+                                <div className="bg-purple-400 border border-purple-600 rounded p-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-purple-900">Bath</div></div>
+                              </>
+                            ) : (
+                              // Layout 3: Suite style
+                              <>
+                                <div className="bg-blue-400 border border-blue-600 rounded p-1 col-span-2 row-span-2 flex flex-col items-center justify-center"><div className="text-xs font-bold text-blue-900">Master Suite</div></div>
+                                <div className="bg-yellow-300 border border-yellow-600 rounded p-1 col-span-1 row-span-2 flex flex-col items-center justify-center"><div className="text-xs font-bold text-yellow-900">Living</div></div>
+                                <div className="bg-red-400 border border-red-600 rounded p-1 col-span-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-red-900">Kitchen</div></div>
+                                <div className="bg-blue-300 border border-blue-600 rounded p-1 col-span-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-blue-900">Bed 2</div></div>
+                                <div className="bg-purple-400 border border-purple-600 rounded p-1 col-span-1 flex flex-col items-center justify-center"><div className="text-xs font-bold text-purple-900">Bath</div></div>
+                              </>
+                            )}
                           </div>
                           <div className="absolute top-1 right-1 bg-white rounded px-2 py-1 text-xs font-bold text-slate-800">{Math.round(specification.totalBuildingArea)}m²</div>
                         </div>
@@ -361,10 +424,18 @@ export function HomeConfigurator() {
           </div>
         </div>
       </div>
+      </div>
     </div>
   )
 }
 
 function generatePDFContent(config: HomeBuilderConfig & { bedrooms?: number }, spec: HomeSpecification): string {
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Home Plan Report</title><style>body{font-family:Arial,sans-serif;margin:40px;color:#333;background:#f9fafb}.container{background:white;padding:40px;border-radius:8px}h1{color:#1f2937;border-bottom:3px solid #2563eb;padding-bottom:15px;margin-bottom:30px}h2{color:#1f2937;margin-top:30px;margin-bottom:15px;border-left:4px solid #2563eb;padding-left:15px}.section{margin:20px 0}.row{display:flex;gap:20px}.col{flex:1}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{padding:12px;text-align:left;border-bottom:1px solid #e5e7eb}th{background:#f3f4f6;font-weight:bold}.cost-section{background:#f9fafb;padding:20px;border-radius:8px;margin:15px 0;border-left:4px solid #2563eb}.highlight{background:#dbeafe;padding:15px;border-left:4px solid #2563eb;margin:15px 0;border-radius:4px}.total{font-weight:bold;background:#f3f4f6}.footer{margin-top:40px;padding-top:20px;border-top:1px solid #d1d5db;font-size:12px;color:#6b7280;text-align:center}</style></head><body><div class="container"><h1>HOME PLAN & COST REPORT</h1><div class="section"><h2>Project Details</h2><div class="row"><div class="col"><strong>Country:</strong> ${config.country}<br><strong>Land:</strong> ${config.landSize}m²<br><strong>Budget:</strong> $${config.budget.toLocaleString()}</div><div class="col"><strong>Style:</strong> ${config.style}<br><strong>Size:</strong> ${config.sizePreference}<br><strong>Bedrooms:</strong> ${config.bedrooms}</div></div></div><div class="section"><h2>Home Specification</h2><div class="cost-section"><div class="row"><div class="col"><strong>Building Area:</strong> ${Math.round(spec.totalBuildingArea)}m²</div><div class="col"><strong>Bedrooms:</strong> ${spec.bedrooms}</div><div class="col"><strong>Timeline:</strong> ${spec.estimatedTimelineMonths} months</div></div></div></div><div class="section"><h2>Cost Breakdown</h2><table><tr><th>Item</th><th>Cost</th></tr><tr><td>Building Construction</td><td>$${spec.buildingCost.toLocaleString()}</td></tr><tr><td>Labor</td><td>$${spec.laborCost.toLocaleString()}</td></tr><tr><td>Infrastructure</td><td>$${spec.infrastructureCost.toLocaleString()}</td></tr>${spec.featuresCost > 0 ? `<tr><td>Features</td><td>$${spec.featuresCost.toLocaleString()}</td></tr>` : ""}<tr class="total"><td>TOTAL</td><td>$${spec.totalCost.toLocaleString()}</td></tr></table></div><div class="section"><h2>Annual Operating Costs</h2><div class="highlight"><strong>Maintenance:</strong> $${spec.annualMaintenanceCost.toLocaleString()}/year<br><strong>Utilities:</strong> $${spec.monthlyUtilitiesCost.toLocaleString()}/month<br><strong>Tax:</strong> $${spec.propertyTaxAnnual.toLocaleString()}/year<br><strong>Insurance:</strong> $${spec.insuranceAnnual.toLocaleString()}/year</div></div><div class="section"><h2>Budget Status</h2><div class="cost-section"><strong>Total Budget:</strong> $${config.budget.toLocaleString()}<br><strong>Project Cost:</strong> $${spec.totalCost.toLocaleString()}<br><strong>Remaining:</strong> ${spec.remainingBudget > 0 ? `$${spec.remainingBudget.toLocaleString()}` : `($${Math.abs(spec.remainingBudget).toLocaleString()})`}<br><strong>Used:</strong> ${spec.percentageUsed.toFixed(1)}%</div></div><div class="footer"><p>Generated by Housing Planning Tool</p></div></div></body></html>`
+  const featureRow = spec.featuresCost > 0 ? `<tr><td>Features</td><td>$${spec.featuresCost.toLocaleString()}</td></tr>` : ""
+  const remainingText = spec.remainingBudget > 0 ? `$${spec.remainingBudget.toLocaleString()}` : `($${Math.abs(spec.remainingBudget).toLocaleString()})`
+  
+  const styleContent = "body{font-family:Arial,sans-serif;margin:40px;color:#333;background:#f9fafb}.container{background:white;padding:40px;border-radius:8px}h1{color:#1f2937;border-bottom:3px solid #2563eb;padding-bottom:15px;margin-bottom:30px}h2{color:#1f2937;margin-top:30px;margin-bottom:15px;border-left:4px solid #2563eb;padding-left:15px}.section{margin:20px 0}.row{display:flex;gap:20px}.col{flex:1}table{width:100%;border-collapse:collapse;margin-top:15px}th,td{padding:12px;text-align:left;border-bottom:1px solid #e5e7eb}th{background:#f3f4f6;font-weight:bold}.cost-section{background:#f9fafb;padding:20px;border-radius:8px;margin:15px 0;border-left:4px solid #2563eb}.highlight{background:#dbeafe;padding:15px;border-left:4px solid #2563eb;margin:15px 0;border-radius:4px}.total{font-weight:bold;background:#f3f4f6}.footer{margin-top:40px;padding-top:20px;border-top:1px solid #d1d5db;font-size:12px;color:#6b7280;text-align:center}"
+  
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Home Plan Report</title><style>${styleContent}</style></head><body><div class="container"><h1>HOME PLAN & COST REPORT</h1><div class="section"><h2>Project Details</h2><div class="row"><div class="col"><strong>Country:</strong> ${config.country}<br><strong>Land:</strong> ${config.landSize}m²<br><strong>Budget:</strong> $${config.budget.toLocaleString()}</div><div class="col"><strong>Style:</strong> ${config.style}<br><strong>Size:</strong> ${config.sizePreference}<br><strong>Bedrooms:</strong> ${config.bedrooms}</div></div></div><div class="section"><h2>Home Specification</h2><div class="cost-section"><div class="row"><div class="col"><strong>Building Area:</strong> ${Math.round(spec.totalBuildingArea)}m²</div><div class="col"><strong>Bedrooms:</strong> ${spec.bedrooms}</div><div class="col"><strong>Timeline:</strong> ${spec.estimatedTimelineMonths} months</div></div></div></div><div class="section"><h2>Cost Breakdown</h2><table><tr><th>Item</th><th>Cost</th></tr><tr><td>Building Construction</td><td>$${spec.buildingCost.toLocaleString()}</td></tr><tr><td>Labor</td><td>$${spec.laborCost.toLocaleString()}</td></tr><tr><td>Infrastructure</td><td>$${spec.infrastructureCost.toLocaleString()}</td></tr>${featureRow}<tr class="total"><td>TOTAL</td><td>$${spec.totalCost.toLocaleString()}</td></tr></table></div><div class="section"><h2>Annual Operating Costs</h2><div class="highlight"><strong>Maintenance:</strong> $${spec.annualMaintenanceCost.toLocaleString()}/year<br><strong>Utilities:</strong> $${spec.monthlyUtilitiesCost.toLocaleString()}/month<br><strong>Tax:</strong> $${spec.propertyTaxAnnual.toLocaleString()}/year<br><strong>Insurance:</strong> $${spec.insuranceAnnual.toLocaleString()}/year</div></div><div class="section"><h2>Budget Status</h2><div class="cost-section"><strong>Total Budget:</strong> $${config.budget.toLocaleString()}<br><strong>Project Cost:</strong> $${spec.totalCost.toLocaleString()}<br><strong>Remaining:</strong> ${remainingText}<br><strong>Used:</strong> ${spec.percentageUsed.toFixed(1)}%</div></div><div class="footer"><p>Generated by Housing Planning Tool</p></div></div></body></html>`
+  
+  return html
 }

@@ -207,3 +207,78 @@ export interface CostAssumptions {
     hallway: number
   }
 }
+
+// Home Configurator Types - for individual homeowners
+export interface HomeBuilderConfig {
+  id: string
+  userId: string
+  country: string
+  countryCode: string
+  landSize: number // in square meters
+  budget: number // total budget in USD
+  style: "basic" | "standard" | "luxury" | "modern" | "traditional"
+  sizePreference: "small" | "medium" | "large" | "spacious"
+  features: {
+    solarPanels: boolean
+    smartHome: boolean
+    airConditioning: boolean
+    swimmingPool: boolean
+    garage: boolean
+    garden: boolean
+  }
+  createdAt: string
+  updatedAt: string
+}
+
+export interface HomeSpecification {
+  totalBuildingArea: number // m²
+  bedrooms: number
+  bathrooms: number
+  livingArea: number // m²
+  kitchenArea: number // m²
+  
+  // Cost breakdown
+  buildingCost: number // total construction cost
+  costPerSqm: number
+  infrastructureCost: number
+  featuresCost: number // additional features
+  laborCost: number
+  totalCost: number
+  
+  // Maintenance and operations
+  annualMaintenanceCost: number
+  monthlyUtilitiesCost: number
+  propertyTaxAnnual: number
+  insuranceAnnual: number
+  
+  // Timeline
+  estimatedTimelineMonths: number
+  
+  // Room breakdown
+  roomBreakdown: {
+    room: string
+    area: number // m²
+    description: string
+  }[]
+  
+  // Features included
+  includedFeatures: {
+    feature: string
+    cost: number
+    description: string
+  }[]
+  
+  // Budget analysis
+  remainingBudget: number
+  percentageUsed: number
+}
+
+export interface HomeBuilderResult {
+  config: HomeBuilderConfig
+  specification: HomeSpecification
+  visualization: {
+    lotSize: number
+    houseSize: number
+    coverage: number // percentage of lot
+  }
+}
